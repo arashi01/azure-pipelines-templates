@@ -2,19 +2,19 @@
 # See https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#extend-from-a-template
 parameters:
   - name: jdk8Container
-    default: $[ variables.jdk8ContainerDefault ]
+    default: 'duchessa/el8-jdk:8'
     type: string
   - name: jdk11Container
-    default: $[ variables.jdk11ContainerDefault ]
+    default: 'duchessa/el8-jdk:11'
     type: string
   - name: publishContainer
-    default: $[ variables.jdk8ContainerDefault ]
+    default: 'duchessa/el8-jdk:8'
     type: string
   - name: javaOptions
-    default: $[ variables.javaOptionsDefault ]
+    default: '-Xmx4G -XX:MaxMetaspaceSize=1G'
     type: string
   - name: sbtBintrayVersion
-    default: $[ variables.sbtBintrayVersionDefault ]
+    default: '0.5.6'
     type: string
   - name: publishOptionsVariableGroup
     default: ''
@@ -24,9 +24,6 @@ parameters:
     type: string
   - name: bintrayRepository
     default: ''
-
-variables:
-  template: variables.yml
 
 stages:
   - template: stages/integration_build-sbt.yml
