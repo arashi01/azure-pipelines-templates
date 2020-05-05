@@ -28,26 +28,6 @@ parameters:
 variables:
   template: variables.yml
 
-trigger:
-  branches:
-    include:
-      - master
-      - refs/tags/*
-  paths:
-    exclude:
-      - README.md
-      - NOTICE
-
-pr:
-  branches:
-    include:
-      - master
-  paths:
-    exclude:
-      - azure-pipelines.yml
-      - README.md
-      - NOTICE
-
 stages:
   - template: stages/integration_build-sbt.yml
     parameters:
