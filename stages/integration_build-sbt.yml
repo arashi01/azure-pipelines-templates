@@ -1,0 +1,41 @@
+# Template for building and publishing tests for an sbt project.
+parameters:
+  - name: javaOptions
+    default: ''
+    type: string
+  - name: jdk8Container
+    default: ''
+    type: string
+  - name: jdk11Container
+    default: ''
+    type: string
+
+stages:
+  - stage: 'Integration_Build'
+    displayName: 'Build Project & Run Integration Tests'
+    jobs:
+      - job: Build
+        displayName: 'Build & Test Project'
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          matrix:
+            'Java 8':
+              containerImage: ${{ parameters.jdk8Container }}
+            'Java 11':
+              containerImage: ${{ parameters.jdk11Container }}
+        container: $[ variables['containerImage'] ]
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                sbt +test +package
+              noProfile: false
+              noRc: false
+            env:
+              JAVA_OPTS: ${{ parameters.javaOptions }}
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/target/**/TEST-*.xml'

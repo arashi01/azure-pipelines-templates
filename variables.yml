@@ -1,0 +1,13 @@
+variables:
+  - name: jdk8ContainerDefault
+    value: 'duchessa/el8-jdk:8'
+  - name: jdk11ContainerDefault
+    value: 'duchessa/el8-jdk:11'
+  - name: javaOptionsDefault
+    value: '-Xmx4G -XX:MaxMetaspaceSize=1G'
+  - name: sbtBintrayVersionDefault
+    value: '0.5.6'
+  - name: sbtAetherVersionDefault
+    value: '0.24.0'
+  - name: sbtPgpVersionDefault
+    value: '2.0.1'

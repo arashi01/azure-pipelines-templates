@@ -1,0 +1,64 @@
+# CI template for sbt projects. Should be extended for use.
+# See https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#extend-from-a-template
+parameters:
+  - name: jdk8Container
+    default: ${{ variables.jdk8ContainerDefault }}
+    type: string
+  - name: jdk11Container
+    default: ${{ variables.jdk11ContainerDefault }}
+    type: string
+  - name: publishContainer
+    default: ${{ variables.jdk8ContainerDefault }}
+    type: string
+  - name: javaOptions
+    default: ${{ variables.javaOptionsDefault }}
+    type: string
+  - name: sbtBintrayVersion
+    default: ${{ variables.sbtBintrayVersion }}
+    type: string
+  - name: publishOptionsVariableGroup
+    default: ''
+    type: string
+  - name: bintrayOrganisation
+    default: ''
+    type: string
+  - name: bintrayRepository
+    default: ''
+
+variables:
+  template: variables.yml
+
+trigger:
+  branches:
+    include:
+      - master
+      - refs/tags/*
+  paths:
+    exclude:
+      - README.md
+      - NOTICE
+
+pr:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - azure-pipelines.yml
+      - README.md
+      - NOTICE
+
+stages:
+  - template: stages/integration_build-sbt.yml
+    parameters:
+      jdk8Container: ${{ parameters.jdk8Container }}
+      jdk11Container: ${{ parameters.jdk11Container }}
+      javaOptions: ${{ parameters.javaOptions }}
+  - template: stages/publish_release-sbt-bintray.yml
+    parameters:
+      publishContainer: ${{ parameters.publishContainer }}
+      javaOptions: ${{ parameters.javaOptions }}
+      publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+      sbtBintrayVersion: ${{ parameters.sbtBintrayVersion }}
+      bintrayOrganisation: ${{ parameters.bintrayOrganisation }}
+      bintrayRepository: ${{ parameters.bintrayRepository }}

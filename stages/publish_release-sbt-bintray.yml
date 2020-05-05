@@ -1,0 +1,54 @@
+# Template for publishing an sbt project to a Bintray repository.
+#
+# Note: Depends on a secure variable group which must contain
+# 'bintray-options' variable with contents in format suitable for
+# appending to JAVA_HOME environment.
+parameters:
+  - name: publishContainer
+    default: ''
+    type: string
+  - name: javaOptions
+    default: ''
+    type: string
+  - name: publishOptionsVariableGroup
+    default: ''
+    type: string
+  - name: sbtBintrayVersion
+    default: ''
+    type: string
+  - name: bintrayOrganisation
+    default: ''
+    type: string
+  - name: bintrayRepository
+    default: ''
+
+stages:
+  - stage: 'Publish_Release'
+    displayName: 'Publish Tagged Release'
+    # Must be run after a successful 'Integration_Build' stage. For example ../integration_build-sbt.yml
+    dependsOn: 'Integration_Build'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    variables:
+      - group: ${{ parameters.publishOptionsVariableGroup }}
+    jobs:
+      - job: Publish
+        displayName: 'Publish Binaries'
+        pool:
+          vmImage: 'ubuntu-latest'
+        container: ${{ parameters.publishContainer }}
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo -e "addSbtPlugin(\"org.foundweekends\" % \"sbt-bintray\" % \"${{ parameters.sbtBintrayVersion }}\")" > project/bintray.sbt
+                echo -e "\nbintrayOrganization := Some(\"${{ parameters.bintrayOrganisation }}\")\n\nbintrayRepository := \"${{ parameters.bintrayRepository }}\"" >> build.sbt
+                echo -e "\npublishMavenStyle := false" >> build.sbt
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: sbt clean +publish
+              noProfile: false
+              noRc: false
+            env:
+              JAVA_OPTS: '${{ parameters.javaOptions }} $(bintray-options)'
