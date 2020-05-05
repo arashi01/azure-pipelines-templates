@@ -2,19 +2,19 @@
 # See https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#extend-from-a-template
 parameters:
   - name: jdk8Container
-    default: ${{ variables.jdk8ContainerDefault }}
+    default: $[ variables.jdk8ContainerDefault ]
     type: string
   - name: jdk11Container
-    default: ${{ variables.jdk11ContainerDefault }}
+    default: $[ variables.jdk11ContainerDefault ]
     type: string
   - name: publishContainer
-    default: ${{ variables.jdk8ContainerDefault }}
+    default: $[ variables.jdk8ContainerDefault ]
     type: string
   - name: javaOptions
-    default: ${{ variables.javaOptionsDefault }}
+    default: $[ variables.javaOptionsDefault ]
     type: string
   - name: sbtBintrayVersion
-    default: ${{ variables.sbtBintrayVersion }}
+    default: $[ variables.sbtBintrayVersionDefault ]
     type: string
   - name: publishOptionsVariableGroup
     default: ''
