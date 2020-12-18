@@ -1,0 +1,79 @@
+# CI template for sbt projects. Should be extended for use.
+# See https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#extend-from-a-template
+parameters:
+  - name: publishStyle
+    default: 'maven'
+    type: string
+    values:
+      - 'maven'
+      - 'bintray'
+      - 'none'
+  - name: jdk8Container
+    default: 'duchessa/el8-jdk:8'
+    type: string
+  - name: jdk11Container
+    default: 'duchessa/el8-jdk:11'
+    type: string
+  - name: publishContainer
+    default: 'duchessa/el8-jdk:8'
+    type: string
+  - name: javaOptions
+    default: '-Xmx4G -XX:MaxMetaspaceSize=1G'
+    type: string
+  - name: sbtBintrayVersion
+    default: '0.6.1'
+    type: string
+  - name: sbtPgpVersion
+    default: '2.1.1'
+    type: string
+  - name: sbtAetherVersion
+    default: '0.26.0'
+    type: string
+  - name: publishOptionsVariableGroup
+    default: ''
+    type: string
+  - name: bintrayOrganisation
+    default: ''
+    type: string
+  - name: bintrayRepository
+    default: ''
+  - name: mavenReleaseRepository
+    type: string
+    default: ''
+  - name: mavenSnapshotRepository
+    type: string
+    default: ''
+
+stages:
+  - template: stages/integration_build-sbt.yml
+    parameters:
+      jdk8Container: ${{ parameters.jdk8Container }}
+      jdk11Container: ${{ parameters.jdk11Container }}
+      javaOptions: ${{ parameters.javaOptions }}
+
+# For Bintray projects, run stages/publish_release-sbt-bintray.yml, for tags
+- ${{ if and(eq(parameters.publishStyle, 'bintray'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')) }}:
+  - template: stages/publish_release-sbt-bintray.yml
+    parameters:
+      jdk8Container: ${{ parameters.jdk8Container }}
+      jdk11Container: ${{ parameters.jdk11Container }}
+      publishContainer: ${{ parameters.publishContainer }}
+      javaOptions: ${{ parameters.javaOptions }}
+      publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+      sbtBintrayVersion: ${{ parameters.sbtBintrayVersion }}
+      bintrayOrganisation: ${{ parameters.bintrayOrganisation }}
+      bintrayRepository: ${{ parameters.bintrayRepository }}
+
+# For Maven projects, run stages/publish_release-sbt-aether.yml for tags, master branch and branched release commits.
+- ${{ if and(eq(parameters.publishStyle, 'maven'), or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))) }}:
+  - template: stages/publish_release-sbt-aether.yml
+    parameters:
+      jdk8Container: ${{ parameters.jdk8Container }}
+      jdk11Container: ${{ parameters.jdk11Container }}
+      publishContainer: ${{ parameters.publishContainer }}
+      javaOptions: ${{ parameters.javaOptions }}
+      publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+      mavenReleaseRepository: ${{ parameters.mavenReleaseRepository }}
+      mavenSnapshotRepository: ${{ parameters.mavenSnapshotRepository }}
+      sbtPgpVersion: ${{ parameters.sbtPgpVersion }}
+      sbtAetherVersion: ${{ parameters.sbtAetherVersion }}

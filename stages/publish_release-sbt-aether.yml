@@ -1,0 +1,80 @@
+# Template for publishing an sbt project to a Maven repository.
+#
+# Note: Depends on a secure variable group, defined by the 'publishOptionsVariableGroup' parameter
+# which must contain the following variables for configuration of the publishing environment:
+#
+# 'maven-user': String
+# 'maven-key': String
+# 'maven-realm': String
+# 'maven-host': String
+# 'signing-key': String
+# 'signing-key-id': String
+# 'signing-key-key': String
+parameters:
+  - name: publishContainer
+    default: ''
+    type: string
+  - name: javaOptions
+    default: ''
+    type: string
+  - name: publishOptionsVariableGroup
+    default: ''
+    type: string
+  - name: mavenSnapshotRepository
+    default: ''
+    type: string
+  - name: mavenReleaseRepository
+    default: ''
+    type: string
+  - name: sbtPgpVersion
+    default: ''
+    type: string
+  - name: sbtAetherVersion
+    default: ''
+    type: string
+
+stages:
+  - stage: 'Publish_Release'
+    displayName: 'Publish Release'
+    # Must be run after a successful 'Integration_Build' stage (for example ./integration_build-sbt.yml)
+    dependsOn: 'Integration_Build'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      - group: ${{ parameters.publishOptionsVariableGroup }}
+    jobs:
+      - job: Publish
+        displayName: 'Publish Binaries'
+        pool:
+          vmImage: 'ubuntu-latest'
+        container: ${{ parameters.publishContainer }}
+        steps:
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo -e $SIGNING_KEY | gpg --import --import-options keep-ownertrust
+                echo -e $SIGNING_KEY_ID:6: | gpg --import-ownertrust
+                echo -e "addSbtPlugin(\"com.jsuereth\" % \"sbt-pgp\" % \"${{ parameters.sbtPgpVersion }}\")\n" > project/sbtpgp.sbt
+                echo -e "addSbtPlugin(\"no.arktekk.sbt\" % \"aether-deploy-signed\" % \"${{ parameters.sbtAetherVersion }}\")\n" > project/aetherdeploy.sbt
+                echo -e "\nThisBuild / publishMavenStyle := true\n" >> build.sbt
+                echo -e "ThisBuild / publishTo := Some(\"Maven Repository\" at { if (isSnapshot.value) System.getenv(\"MAVEN_SNAPSHOT_REPOSITORY\") else System.getenv(\"MAVEN_RELEASE_REPOSITORY\") })\n" >> build.sbt
+                echo -e "ThisBuild / credentials += Credentials(System.getenv(\"MAVEN_REALM\"), System.getenv(\"MAVEN_HOST\"), System.getenv(\"MAVEN_USER\"), System.getenv(\"MAVEN_KEY\"))\n" >> build.sbt
+            env:
+              SIGNING_KEY: $(signing-key)
+              SIGNING_KEY_ID: $(signing-key-id)
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: sbt clean +aetherDeploy
+              noProfile: false
+              noRc: false
+            env:
+              JAVA_OPTS: ${{ parameters.javaOptions }}
+              MAVEN_SNAPSHOT_REPOSITORY: ${{ parameters.mavenSnapshotRepository }}
+              MAVEN_RELEASE_REPOSITORY: ${{ parameters.mavenReleaseRepository }}
+              MAVEN_USER: $(maven-user)
+              MAVEN_KEY: $(maven-key)
+              MAVEN_REALM: $(maven-realm)
+              MAVEN_HOST: $(maven-host)
+              PGP_PASSPHRASE: $(signing-key-key)
+

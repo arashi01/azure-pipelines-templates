@@ -1,8 +1,10 @@
 # Template for publishing an sbt project to a Bintray repository.
 #
-# Note: Depends on a secure variable group which must contain
-# 'bintray-options' variable with contents in format suitable for
-# appending to JAVA_HOME environment.
+# Note: Depends on a secure variable group defined by the 'publishOptionsVariableGroup' parameter which must contain
+# the following variables for configuration of the publishing environment:
+#
+# 'bintray-user': String
+# 'bintray-key': String
 parameters:
   - name: publishContainer
     default: ''
@@ -25,7 +27,7 @@ parameters:
 stages:
   - stage: 'Publish_Release'
     displayName: 'Publish Tagged Release'
-    # Must be run after a successful 'Integration_Build' stage. For example ../integration_build-sbt.yml
+    # Must be run on tags only, and after a successful 'Integration_Build' stage. For example ./integration_build-sbt.yml
     dependsOn: 'Integration_Build'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     variables:
@@ -51,4 +53,6 @@ stages:
               noProfile: false
               noRc: false
             env:
-              JAVA_OPTS: '${{ parameters.javaOptions }} $(bintray-options)'
+              JAVA_OPTS: ${{ parameters.javaOptions }}
+              BINTRAY_USER: $(bintray-user)
+              BINTRAY_PASS: $(bintray-key)
