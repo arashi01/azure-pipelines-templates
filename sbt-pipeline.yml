@@ -55,8 +55,6 @@ stages:
   - ${{ if and(eq(parameters.publishStyle, 'bintray'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')) }}:
     - template: stages/publish_release-sbt-bintray.yml
       parameters:
-        jdk8Container: ${{ parameters.jdk8Container }}
-        jdk11Container: ${{ parameters.jdk11Container }}
         publishContainer: ${{ parameters.publishContainer }}
         javaOptions: ${{ parameters.javaOptions }}
         credentialsGroup: ${{ parameters.credentialsGroup }}
@@ -68,8 +66,6 @@ stages:
   - ${{ if and(eq(parameters.publishStyle, 'maven'), or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))) }}:
     - template: stages/publish_release-sbt-aether.yml
       parameters:
-        jdk8Container: ${{ parameters.jdk8Container }}
-        jdk11Container: ${{ parameters.jdk11Container }}
         publishContainer: ${{ parameters.publishContainer }}
         javaOptions: ${{ parameters.javaOptions }}
         credentialsGroup: ${{ parameters.credentialsGroup }}
