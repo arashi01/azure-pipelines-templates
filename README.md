@@ -14,7 +14,7 @@ See Azure Pipelines [template documentation] for comprehensive template usage do
 #### Required Parameters for all projects
 | Parameter Name | Description | Default Value *(if present)* |
 | -------------- | ----------- | ---------------------------- |
-| `publishStyle` | Defines which publishing template to use. Accepted values are: `maven`, `bintray`, or `none` to disable publishing. | `maven` |
+| `publishStyle` | Defines which publishing template to use. Accepted values are: `maven`, `bintray`, or `none` to disable publishing. | `none` |
 | `jdk8Container` | Defines docker container used for compiling and running Java 8 integration tests. | `duchessa/el8-jdk:8` |
 | `jdk11Container` | Defines docker container used for compiling and running Java 11 integration tests. | `duchessa/el8-jdk:11` |
 | `javaOptions` | Java options passed to sbt during execution of all tasks. | `-Xmx4G -XX:MaxMetaspaceSize=1G` |
@@ -25,7 +25,7 @@ See Azure Pipelines [template documentation] for comprehensive template usage do
 | `publishContainer` | Defines docker container used for compiling published artefacts. | `duchessa/el8-jdk:8` |
 | `sbtPgpVersion` | Version of `sbt-pgp` plugin used when publishing. | `2.1.1` |
 | `sbtAetherVersion` | Version of `sbt-aether-deploy-signed` plugin used when publishing. | `0.26.0` |
-| `publishOptionsVariableGroup` | Name of variable group containing credentials used for publishing. Variable group must contain `maven-user`, `maven-key`, `maven-host`, and `maven-realm` secure variables providing Maven repository credentials. | |
+| `credentialsGroup` | Name of variable group containing credentials used for publishing. Variable group must contain `maven-user`, `maven-key`, `maven-host`, and `maven-realm` secure variables providing Maven repository credentials. | |
 | `mavenReleaseRepository` | Maven repository to publish release artifacts to (as defined by sbt `isSnapshot` setting) | |
 | `mavenSnapshotRepository` | Maven repository to publish snapshot artifacts to (as defined by sbt `isSnapshot` setting) | |
 
@@ -34,12 +34,12 @@ See Azure Pipelines [template documentation] for comprehensive template usage do
 | -------------- | ----------- | ---------------------------- |
 | `publishContainer` | Defines docker container used for compiling published artefacts. | `duchessa/el8-jdk:8` |
 | `sbtBintrayVersion` | Version of sbt-bintray plugin used when publishing. | `0.6.1` |
-| `publishOptionsVariableGroup` | Name of variable group containing credentials used for publishing. Variable group must contain `bintray-user` and `bintray-key` secure variables providing bintray credentials. | |
+| `credentialsGroup` | Name of [pipelines variable group] containing credentials used for publishing. Variable group must contain `bintray-user` and `bintray-key` secure variables providing bintray credentials. | |
 | `bintrayOrganisation` | Bintray organisation to publish to. | |
 | `bintrayRepository` | Bintray repository to publish to. | |
 
 
-_NB: For `publishOptionsVariableGroup` only a secure variable group **[backed by secrets]** in Azure Key Vault should be used._
+_NB: For `credentialsGroup` only a secure variable group **[backed by secrets]** in Azure Key Vault should be used._
 
 Example usage below:
 ```yaml
@@ -76,11 +76,12 @@ extends:
   template: sbt-pipeline.yml@templates
   parameters:
     publishStyle: 'maven'
-    publishOptionsVariableGroup: 'publish-secret-vars'
+    credentialsGroup: 'publish-secret-vars'
     mavenReleaseRepository: 'https://maven-url/releases'
     mavenSnapshotRepository: 'https://maven-url/snapshots'
 ```
 
 [YAML templates]: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates
 [template documentation]: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates
+[pipelines variable group]: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups
 [backed by secrets]: https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#link-secrets-from-an-azure-key-vault

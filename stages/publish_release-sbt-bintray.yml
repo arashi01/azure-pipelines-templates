@@ -1,6 +1,6 @@
 # Template for publishing an sbt project to a Bintray repository.
 #
-# Note: Depends on a secure variable group defined by the 'publishOptionsVariableGroup' parameter which must contain
+# Note: Depends on a secure variable group defined by the 'credentialsGroup' parameter which must contain
 # the following variables for configuration of the publishing environment:
 #
 # 'bintray-user': String
@@ -12,7 +12,7 @@ parameters:
   - name: javaOptions
     default: ''
     type: string
-  - name: publishOptionsVariableGroup
+  - name: credentialsGroup
     default: ''
     type: string
   - name: sbtBintrayVersion
@@ -31,7 +31,7 @@ stages:
     dependsOn: 'Integration_Build'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     variables:
-      - group: ${{ parameters.publishOptionsVariableGroup }}
+      - group: ${{ parameters.credentialsGroup }}
     jobs:
       - job: Publish
         displayName: 'Publish Binaries'

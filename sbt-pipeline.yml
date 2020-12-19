@@ -2,7 +2,7 @@
 # See https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#extend-from-a-template
 parameters:
   - name: publishStyle
-    default: 'maven'
+    default: 'none'
     type: string
     values:
       - 'maven'
@@ -29,7 +29,7 @@ parameters:
   - name: sbtAetherVersion
     default: '0.26.0'
     type: string
-  - name: publishOptionsVariableGroup
+  - name: credentialsGroup
     default: ''
     type: string
   - name: bintrayOrganisation
@@ -59,7 +59,7 @@ stages:
         jdk11Container: ${{ parameters.jdk11Container }}
         publishContainer: ${{ parameters.publishContainer }}
         javaOptions: ${{ parameters.javaOptions }}
-        publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+        credentialsGroup: ${{ parameters.credentialsGroup }}
         sbtBintrayVersion: ${{ parameters.sbtBintrayVersion }}
         bintrayOrganisation: ${{ parameters.bintrayOrganisation }}
         bintrayRepository: ${{ parameters.bintrayRepository }}
@@ -72,7 +72,7 @@ stages:
         jdk11Container: ${{ parameters.jdk11Container }}
         publishContainer: ${{ parameters.publishContainer }}
         javaOptions: ${{ parameters.javaOptions }}
-        publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+        credentialsGroup: ${{ parameters.credentialsGroup }}
         mavenReleaseRepository: ${{ parameters.mavenReleaseRepository }}
         mavenSnapshotRepository: ${{ parameters.mavenSnapshotRepository }}
         sbtPgpVersion: ${{ parameters.sbtPgpVersion }}

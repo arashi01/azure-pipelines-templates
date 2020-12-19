@@ -1,6 +1,6 @@
 # Template for publishing an sbt project to a Maven repository.
 #
-# Note: Depends on a secure variable group, defined by the 'publishOptionsVariableGroup' parameter
+# Note: Depends on a secure variable group, defined by the 'credentialsGroup' parameter
 # which must contain the following variables for configuration of the publishing environment:
 #
 # 'maven-user': String
@@ -17,7 +17,7 @@ parameters:
   - name: javaOptions
     default: ''
     type: string
-  - name: publishOptionsVariableGroup
+  - name: credentialsGroup
     default: ''
     type: string
   - name: mavenSnapshotRepository
@@ -40,7 +40,7 @@ stages:
     dependsOn: 'Integration_Build'
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     variables:
-      - group: ${{ parameters.publishOptionsVariableGroup }}
+      - group: ${{ parameters.credentialsGroup }}
     jobs:
       - job: Publish
         displayName: 'Publish Binaries'
