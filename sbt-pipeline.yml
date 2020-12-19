@@ -52,28 +52,28 @@ stages:
       javaOptions: ${{ parameters.javaOptions }}
 
 # For Bintray projects, run stages/publish_release-sbt-bintray.yml, for tags
-- ${{ if and(eq(parameters.publishStyle, 'bintray'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')) }}:
-  - template: stages/publish_release-sbt-bintray.yml
-    parameters:
-      jdk8Container: ${{ parameters.jdk8Container }}
-      jdk11Container: ${{ parameters.jdk11Container }}
-      publishContainer: ${{ parameters.publishContainer }}
-      javaOptions: ${{ parameters.javaOptions }}
-      publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
-      sbtBintrayVersion: ${{ parameters.sbtBintrayVersion }}
-      bintrayOrganisation: ${{ parameters.bintrayOrganisation }}
-      bintrayRepository: ${{ parameters.bintrayRepository }}
+  - ${{ if and(eq(parameters.publishStyle, 'bintray'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')) }}:
+    - template: stages/publish_release-sbt-bintray.yml
+      parameters:
+        jdk8Container: ${{ parameters.jdk8Container }}
+        jdk11Container: ${{ parameters.jdk11Container }}
+        publishContainer: ${{ parameters.publishContainer }}
+        javaOptions: ${{ parameters.javaOptions }}
+        publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+        sbtBintrayVersion: ${{ parameters.sbtBintrayVersion }}
+        bintrayOrganisation: ${{ parameters.bintrayOrganisation }}
+        bintrayRepository: ${{ parameters.bintrayRepository }}
 
 # For Maven projects, run stages/publish_release-sbt-aether.yml for tags, master branch and branched release commits.
-- ${{ if and(eq(parameters.publishStyle, 'maven'), or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))) }}:
-  - template: stages/publish_release-sbt-aether.yml
-    parameters:
-      jdk8Container: ${{ parameters.jdk8Container }}
-      jdk11Container: ${{ parameters.jdk11Container }}
-      publishContainer: ${{ parameters.publishContainer }}
-      javaOptions: ${{ parameters.javaOptions }}
-      publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
-      mavenReleaseRepository: ${{ parameters.mavenReleaseRepository }}
-      mavenSnapshotRepository: ${{ parameters.mavenSnapshotRepository }}
-      sbtPgpVersion: ${{ parameters.sbtPgpVersion }}
-      sbtAetherVersion: ${{ parameters.sbtAetherVersion }}
+  - ${{ if and(eq(parameters.publishStyle, 'maven'), or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))) }}:
+    - template: stages/publish_release-sbt-aether.yml
+      parameters:
+        jdk8Container: ${{ parameters.jdk8Container }}
+        jdk11Container: ${{ parameters.jdk11Container }}
+        publishContainer: ${{ parameters.publishContainer }}
+        javaOptions: ${{ parameters.javaOptions }}
+        publishOptionsVariableGroup: ${{ parameters.publishOptionsVariableGroup }}
+        mavenReleaseRepository: ${{ parameters.mavenReleaseRepository }}
+        mavenSnapshotRepository: ${{ parameters.mavenSnapshotRepository }}
+        sbtPgpVersion: ${{ parameters.sbtPgpVersion }}
+        sbtAetherVersion: ${{ parameters.sbtAetherVersion }}
