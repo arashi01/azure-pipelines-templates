@@ -24,10 +24,10 @@ parameters:
     default: '0.6.1'
     type: string
   - name: sbtPgpVersion
-    default: '2.1.1'
+    default: '2.1.2'
     type: string
   - name: sbtAetherVersion
-    default: '0.26.0'
+    default: '0.27.0'
     type: string
   - name: credentialsGroup
     default: ''
